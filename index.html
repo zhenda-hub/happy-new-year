@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2026新春蒙福</title>
   <style>
+    /* CSS 变量 - 主题配色 */
+    :root {
+      --bg-start: #0a0a0a;
+      --bg-end: #1a0a0a;
+      --primary-color: #FFD700;
+      --accent-color: #FF0000;
+      --accent-color-2: #FF6B6B;
+      --glow-color: rgba(255, 0, 0, 0.8);
+      --text-glow: rgba(255, 215, 0, 0.8);
+      --border-color: rgba(255, 215, 0, 0.5);
+      --box-shadow: rgba(255, 0, 0, 0.3);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -13,7 +26,7 @@
 
     body {
       font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
-      background: linear-gradient(to bottom, #0a0a0a, #1a0a0a);
+      background: linear-gradient(to bottom, var(--bg-start), var(--bg-end));
       overflow: hidden;
       height: 100vh;
       color: #fff;
@@ -42,11 +55,11 @@
     .title {
       font-size: 4rem;
       font-weight: bold;
-      color: #FFD700;
+      color: var(--primary-color);
       text-shadow:
-        0 0 20px rgba(255, 0, 0, 0.8),
-        0 0 40px rgba(255, 215, 0, 0.6),
-        0 0 60px rgba(255, 0, 0, 0.4);
+        0 0 20px var(--glow-color),
+        0 0 40px var(--text-glow),
+        0 0 60px var(--glow-color);
       animation: titlePulse 3s ease-in-out infinite;
       margin-bottom: 40px;
       text-align: center;
@@ -68,18 +81,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(255, 0, 0, 0.2);
+      background: var(--accent-color-2);
+      background: color-mix(in srgb, var(--accent-color) 20%, transparent);
       padding: 20px;
       border-radius: 15px;
-      border: 2px solid rgba(255, 215, 0, 0.5);
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+      border: 2px solid var(--border-color);
+      box-shadow: 0 0 30px var(--box-shadow);
     }
 
     .number {
       font-size: 4rem;
       font-weight: bold;
-      color: #FFD700;
-      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      color: var(--primary-color);
+      text-shadow: 0 0 20px var(--text-glow);
       font-family: 'Courier New', monospace;
       min-width: 100px;
       text-align: center;
@@ -88,24 +102,65 @@
 
     .label {
       font-size: 1.2rem;
-      color: #FF6B6B;
+      color: var(--accent-color-2);
       margin-top: 10px;
     }
 
     .separator {
       font-size: 3rem;
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--text-glow);
     }
 
     .blessing {
       font-size: 2rem;
-      color: #FFD700;
-      text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+      color: var(--primary-color);
+      text-shadow: 0 0 20px var(--glow-color);
       animation: blessingFade 4s ease-in-out infinite;
       margin-bottom: 40px;
       text-align: center;
       padding: 0 20px;
+    }
+
+    /* 主题选择器 */
+    .theme-selector {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .theme-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .theme-btn.active {
+      border-color: #fff;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+
+    .theme-btn.active::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 16px;
+      text-shadow: 0 0 3px rgba(0,0,0,0.8);
     }
 
     @keyframes blessingFade {
@@ -140,6 +195,9 @@
 <body>
   <canvas id="fireworksCanvas"></canvas>
 
+  <!-- 主题选择器 -->
+  <div class="theme-selector" id="themeSelector"></div>
+
   <main>
     <h1 class="title">✝️🎉 新春蒙福 喜乐平安 🎉✝️</h1>
 
@@ -169,6 +227,145 @@
   </main>
 
   <script>
+    // ========== 主题系统 ==========
+    const themes = {
+      traditional: {
+        name: '🔴 传统喜庆',
+        primary: '#FFD700',
+        accent: '#FF0000',
+        accent2: '#FF6B6B',
+        bgStart: '#0a0a0a',
+        bgEnd: '#1a0a0a',
+        glow: 'rgba(255, 0, 0, 0.8)',
+        textGlow: 'rgba(255, 215, 0, 0.8)',
+        border: 'rgba(255, 215, 0, 0.5)',
+        boxShadow: 'rgba(255, 0, 0, 0.3)',
+        fireworks: ['#FF0000', '#FFD700', '#FF6B6B', '#FFA500', '#FF4500', '#FFFF00'],
+        btnBg: 'linear-gradient(135deg, #FF0000, #CC0000)'
+      },
+      purple: {
+        name: '🟣 紫色梦幻',
+        primary: '#E6B800',
+        accent: '#9B59B6',
+        accent2: '#BB8FCE',
+        bgStart: '#1a0a2e',
+        bgEnd: '#2d1b4e',
+        glow: 'rgba(155, 89, 182, 0.8)',
+        textGlow: 'rgba(230, 184, 0, 0.8)',
+        border: 'rgba(230, 184, 0, 0.5)',
+        boxShadow: 'rgba(155, 89, 182, 0.3)',
+        fireworks: ['#9B59B6', '#E6B800', '#FF69B4', '#DDA0DD', '#BA55D3', '#FFB6C1'],
+        btnBg: 'linear-gradient(135deg, #9B59B6, #8E44AD)'
+      },
+      blue: {
+        name: '🔵 蓝色星空',
+        primary: '#F0E68C',
+        accent: '#3498DB',
+        accent2: '#5DADE2',
+        bgStart: '#0a1628',
+        bgEnd: '#1a2744',
+        glow: 'rgba(52, 152, 219, 0.8)',
+        textGlow: 'rgba(240, 230, 140, 0.8)',
+        border: 'rgba(240, 230, 140, 0.5)',
+        boxShadow: 'rgba(52, 152, 219, 0.3)',
+        fireworks: ['#3498DB', '#F0E68C', '#AED6F1', '#5DADE2', '#85C1E9', '#D7BDE2'],
+        btnBg: 'linear-gradient(135deg, #3498DB, #2980B9)'
+      },
+      green: {
+        name: '🟢 绿色春意',
+        primary: '#FFD700',
+        accent: '#27AE60',
+        accent2: '#58D68D',
+        bgStart: '#0a1a0a',
+        bgEnd: '#1a2e1a',
+        glow: 'rgba(39, 174, 96, 0.8)',
+        textGlow: 'rgba(255, 215, 0, 0.8)',
+        border: 'rgba(255, 215, 0, 0.5)',
+        boxShadow: 'rgba(39, 174, 96, 0.3)',
+        fireworks: ['#27AE60', '#FFD700', '#58D68D', '#1ABC9C', '#2ECC71', '#F1C40F'],
+        btnBg: 'linear-gradient(135deg, #27AE60, #229954)'
+      },
+      pink: {
+        name: '🌸 粉色浪漫',
+        primary: '#FFC0CB',
+        accent: '#E91E63',
+        accent2: '#F48FB1',
+        bgStart: '#2a1a1a',
+        bgEnd: '#3d2828',
+        glow: 'rgba(233, 30, 99, 0.8)',
+        textGlow: 'rgba(255, 192, 203, 0.8)',
+        border: 'rgba(255, 192, 203, 0.5)',
+        boxShadow: 'rgba(233, 30, 99, 0.3)',
+        fireworks: ['#E91E63', '#FFC0CB', '#F48FB1', '#9B59B6', '#FF69B4', '#FFB6C1'],
+        btnBg: 'linear-gradient(135deg, #E91E63, #C2185B)'
+      },
+      silver: {
+        name: '⚪ 银白典雅',
+        primary: '#F5F5F5',
+        accent: '#74B9FF',
+        accent2: '#A6C8FF',
+        bgStart: '#1a1a1a',
+        bgEnd: '#2a2a2a',
+        glow: 'rgba(116, 185, 255, 0.8)',
+        textGlow: 'rgba(245, 245, 245, 0.8)',
+        border: 'rgba(245, 245, 245, 0.5)',
+        boxShadow: 'rgba(116, 185, 255, 0.3)',
+        fireworks: ['#F5F5F5', '#74B9FF', '#A6C8FF', '#E8F4F8', '#B3E5FC', '#FFFFFF'],
+        btnBg: 'linear-gradient(135deg, #74B9FF, #4A90E2)'
+      }
+    };
+
+    let currentTheme = 'traditional';
+    let currentFireworkColors = themes.traditional.fireworks;
+
+    function setTheme(themeName) {
+      const theme = themes[themeName];
+      currentTheme = themeName;
+      currentFireworkColors = theme.fireworks;
+
+      const root = document.documentElement;
+      root.style.setProperty('--bg-start', theme.bgStart);
+      root.style.setProperty('--bg-end', theme.bgEnd);
+      root.style.setProperty('--primary-color', theme.primary);
+      root.style.setProperty('--accent-color', theme.accent);
+      root.style.setProperty('--accent-color-2', theme.accent2);
+      root.style.setProperty('--glow-color', theme.glow);
+      root.style.setProperty('--text-glow', theme.textGlow);
+      root.style.setProperty('--border-color', theme.border);
+      root.style.setProperty('--box-shadow', theme.boxShadow);
+
+      // 更新按钮状态
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === themeName);
+      });
+
+      // 保存到 localStorage
+      localStorage.setItem('theme', themeName);
+    }
+
+    function initThemeSelector() {
+      const container = document.getElementById('themeSelector');
+
+      Object.entries(themes).forEach(([key, theme]) => {
+        const btn = document.createElement('div');
+        btn.className = 'theme-btn';
+        btn.dataset.theme = key;
+        btn.style.background = theme.btnBg;
+        btn.title = theme.name;
+        btn.addEventListener('click', () => setTheme(key));
+        container.appendChild(btn);
+      });
+
+      // 恢复上次选择或使用默认
+      const savedTheme = localStorage.getItem('theme') || 'traditional';
+      setTheme(savedTheme);
+    }
+
+    // 获取当前主题的烟花颜色
+    function getThemeColor() {
+      return currentFireworkColors[Math.floor(Math.random() * currentFireworkColors.length)];
+    }
+
     // 圣经经文祝福语
     const BLESSINGS = [
       '愿耶和华赐福给你，保护你 🙏',
@@ -201,14 +398,9 @@
     const MAX_PARTICLES = isMobile ? 50 : 100;
     const MAX_FIREWORKS = isMobile ? 3 : 5;
 
-    // 烟花颜色主题（红金配色）
+    // 烟花颜色主题（随主题变化）
     function themeColor() {
-      const colors = [
-        '#FF0000', '#FFD700', '#FF6B6B',
-        '#FFA500', '#FF4500', '#FFFF00',
-        '#FF1493', '#FF69B4'
-      ];
-      return colors[Math.floor(Math.random() * colors.length)];
+      return getThemeColor();
     }
 
     // 烟花类
@@ -437,6 +629,9 @@
 
     // 自动烟花默认开启
     let autoFireworkEnabled = true;
+
+    // 初始化主题选择器
+    initThemeSelector();
 
     // 启动动画
     animate();
