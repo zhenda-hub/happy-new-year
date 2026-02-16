@@ -113,59 +113,6 @@
       50% { opacity: 1; }
     }
 
-    .controls {
-      pointer-events: auto;
-      display: flex;
-      gap: 20px;
-    }
-
-    .btn {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      background: linear-gradient(135deg, #FF0000, #CC0000);
-      color: #FFD700;
-      border: 2px solid #FFD700;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-      font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
-    }
-
-    .btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-    }
-
-    .btn.active {
-      background: linear-gradient(135deg, #00AA00, #008800);
-    }
-
-    @keyframes blessingPop {
-      0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(-50%, -100%) scale(1);
-        opacity: 0;
-      }
-    }
-
-    .click-blessing {
-      position: fixed;
-      font-size: 28px;
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-      pointer-events: none;
-      animation: blessingPop 2s ease-out forwards;
-      z-index: 10;
-    }
-
     @media (max-width: 768px) {
       .title {
         font-size: 2rem;
@@ -186,11 +133,6 @@
 
       .blessing {
         font-size: 1.2rem;
-      }
-
-      .btn {
-        padding: 10px 20px;
-        font-size: 1rem;
       }
     }
   </style>
@@ -223,11 +165,7 @@
       </div>
     </div>
 
-    <div class="blessing" id="blessingText">点击屏幕放烟花，领受祝福 🙏</div>
-
-    <div class="controls">
-      <button class="btn" id="autoFirework">🎆 自动烟花</button>
-    </div>
+    <div class="blessing" id="blessingText">愿耶和华赐福给你，保护你 🙏</div>
   </main>
 
   <script>
@@ -420,27 +358,28 @@
       }
     }
 
-    // 点击触发烟花和祝福语
+    // 点击触发烟花
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
       launchFirework(canvas.width / 2, canvas.height, x, y);
-      showBlessingAt(e.clientX, e.clientY);
     });
 
-    function showBlessingAt(x, y) {
-      const blessing = BLESSINGS[Math.floor(Math.random() * BLESSINGS.length)];
-      const el = document.createElement('div');
-      el.className = 'click-blessing';
-      el.textContent = blessing;
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      document.body.appendChild(el);
-
-      setTimeout(() => el.remove(), 2000);
+    // 祝福语自动轮播
+    function startBlessingRotation() {
+      const blessingEl = document.getElementById('blessingText');
+      setInterval(() => {
+        const blessing = BLESSINGS[Math.floor(Math.random() * BLESSINGS.length)];
+        blessingEl.style.opacity = '0';
+        setTimeout(() => {
+          blessingEl.textContent = blessing;
+          blessingEl.style.opacity = '1';
+        }, 500);
+      }, 4000);  // 每4秒切换
     }
+    startBlessingRotation();
 
     // 倒计时
     const targetDate = new Date('2026-02-17T00:00:00').getTime();
@@ -496,20 +435,8 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // 自动烟花开关
-    let autoFireworkEnabled = false;
-    const autoFireworkBtn = document.getElementById('autoFirework');
-
-    autoFireworkBtn.addEventListener('click', () => {
-      autoFireworkEnabled = !autoFireworkEnabled;
-      if (autoFireworkEnabled) {
-        autoFireworkBtn.textContent = '🎆 停止自动';
-        autoFireworkBtn.classList.add('active');
-      } else {
-        autoFireworkBtn.textContent = '🎆 自动烟花';
-        autoFireworkBtn.classList.remove('active');
-      }
-    });
+    // 自动烟花默认开启
+    let autoFireworkEnabled = true;
 
     // 启动动画
     animate();
